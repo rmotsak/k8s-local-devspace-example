@@ -1,0 +1,6 @@
+
+
+# Ignore DevSpace cache and log folder
+.devspace/
+__pycache__/
+src/worker/obj/
