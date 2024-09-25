@@ -81,6 +81,7 @@ function environment_validation() {
     check_tool_is_installed docker
     check_tool_is_installed k3d
     check_tool_is_installed devspace
+    check_tool_is_installed kubectl
 }
 
 function check_tool_is_installed() {
