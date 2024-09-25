@@ -1,0 +1,23 @@
+# Базовий образ з Node.js 14
+FROM node:14
+
+# Встановлюємо nodemon для автоматичного перезапуску
+RUN npm install -g nodemon
+
+# Створюємо робочу директорію
+WORKDIR /app
+
+# Копіюємо package.json та package-lock.json
+COPY package*.json /app/
+
+# Встановлюємо залежності
+RUN npm install
+
+# Копіюємо код додатку
+COPY . /app
+
+# Відкриваємо порт 80
+EXPOSE 80
+
+# Запускаємо додаток з nodemon
+CMD ["nodemon", "app.js"]

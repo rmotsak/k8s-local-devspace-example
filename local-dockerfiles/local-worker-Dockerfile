@@ -1,0 +1,21 @@
+# Базовий образ з .NET SDK 6.0
+FROM mcr.microsoft.com/dotnet/sdk:6.0
+
+# Додаємо шлях до глобальних інструментів .NET
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# Створюємо робочу директорію
+WORKDIR /app
+
+# Копіюємо файли проекту та відновлюємо залежності
+COPY *.csproj ./
+RUN dotnet restore
+
+# Копіюємо решту коду
+COPY . ./
+
+# Відкриваємо порт 80
+EXPOSE 80
+
+# Запускаємо додаток з `dotnet watch run` для автоматичного перезапуску
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:80"]

@@ -1,0 +1,26 @@
+# Базовий образ з Python 3.9
+FROM python:3.9-slim
+
+# Встановлюємо робочу директорію
+WORKDIR /app
+
+# Встановлюємо залежності для компіляції та інших пакетів
+RUN apt-get update && apt-get install -y build-essential
+
+# Встановлюємо бібліотеку watchdog для спостереження за файлами
+RUN pip install watchdog
+
+# Встановлюємо Flask та інші залежності вашого додатку
+COPY requirements.txt /app/requirements.txt
+RUN pip install -r /app/requirements.txt
+
+# Копіюємо код додатку
+COPY . /app
+
+# Встановлюємо змінні середовища для Flask
+ENV FLASK_APP=app.py
+ENV FLASK_RUN_HOST=0.0.0.0
+ENV FLASK_ENV=development
+
+# Запускаємо додаток з автоматичним перезавантаженням
+CMD ["flask", "run", "--reload"]
