@@ -142,6 +142,12 @@ k3d cluster delete mycluster
 devspace purge
 ```
 
+- Розгортання Helm-Chart:
+
+```
+helm install vote-app ./vote-app
+```
+
 ## Приклади конфігурацій
 
 ### Як використати ConfigMap
