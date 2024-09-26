@@ -141,3 +141,192 @@ k3d cluster delete mycluster
 ```
 devspace purge
 ```
+
+## Приклади конфігурацій
+
+### Як використати ConfigMap
+- Створення ConfigMap
+
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  database_url: "postgres://localhost:5432/mydb"
+  log_level: "info"
+```
+
+- Використання ConfigMap
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mycontainer
+    image: myapp:latest
+    env:
+    - name: DATABASE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: database_url
+    - name: LOG_LEVEL
+      valueFrom:
+        configMapKeyRef:
+          name: app-config
+          key: log_level
+```
+
+### Як використати Secret
+- Створення Secret
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secret
+type: Opaque
+data:
+  username: YWRtaW4=  # Значення повинні бути закодовані в Base64
+  password: cGFzc3dvcmQ=
+```
+
+- Використання Secret
+
+```
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mypod
+spec:
+  containers:
+  - name: mycontainer
+    image: myapp:latest
+    env:
+    - name: USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: app-secret
+          key: username
+    - name: PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: app-secret
+          key: password
+```
+
+### Як налаштувати автоматичне збільшення кількості Pod-ів при збільшенні навантаження
+- Створення Horizontal Pod Autoscaler (HPA)
+
+```
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: voting-app-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: voting-app
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50  # Масштабування на основі використання CPU
+
+```
+
+### Як користуватись RBAC (Role-Based Access Control)
+- Створення ролі (Role)
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: default
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+```
+
+- Створення RoleBinding (зв'язування ролі з користувачем або групою)
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: default
+subjects:
+- kind: User
+  name: jane
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+
+- Налаштування ServiceAccount для додатку
+
+```
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: myapp-service-account
+  namespace: app-namespace
+```
+
+- Налаштування ролі (Role)
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: target-namespace
+  name: access-service
+rules:
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+```
+
+- Зв'язування ролі з ServiceAccount через RoleBinding
+
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: bind-access-service
+  namespace: target-namespace
+subjects:
+- kind: ServiceAccount
+  name: myapp-service-account
+  namespace: app-namespace  # ServiceAccount знаходиться в іншому namespace
+roleRef:
+  kind: Role
+  name: access-service
+  apiGroup: rbac.authorization.k8s.io
+```
+
+- Призначення ServiceAccount
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+  namespace: app-namespace
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: myapp-service-account  # Призначаємо ServiceAccount
+      containers:
+      - name: myapp-container
+        image: myapp-image:latest
+```
