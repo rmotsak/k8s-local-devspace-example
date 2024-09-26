@@ -51,7 +51,7 @@ dev:
     # Open a terminal and use the following command to start it
     terminal:
       command: ./devspace_start.sh
-      # command: flask run --host=0.0.0.0 --port=80 --reload
+      # command: pip install -r /app/requirements.txt && flask run --host=0.0.0.0 --port=80 --reload
     # Inject a lightweight SSH server into the container (so your IDE can connect to the remote dev env)
     # ssh:
     #   enabled: true
